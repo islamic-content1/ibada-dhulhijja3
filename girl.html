@@ -14,7 +14,7 @@ html,body{overflow-x:hidden;width:100%}
 body{font-family:'Amiri',system-ui,Tahoma,sans-serif;background:var(--bg);color:var(--tx);padding:1.2rem 0.8rem 3rem}
 .hdr{text-align:center;margin-bottom:1.4rem;padding-bottom:1rem;border-bottom:1.5px solid var(--bd)}
 .bsm{font-size:16px;color:var(--gold);margin-bottom:5px;font-weight:600}
-.hdr h1{font-size:24px;font-weight:700;color:#d4a017;font-family:'Amiri',serif;text-shadow:0 1px 3px rgba(0,0,0,.2)}
+.hdr h1{font-size:24px;font-weight:700;color:#c4a882;font-family:'Amiri',serif;text-shadow:0 1px 3px rgba(0,0,0,.2)}
 .hdr p{font-size:12px;color:var(--mu);margin-top:5px}
 .leg{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;font-size:12px;color:var(--mu)}
 .li{display:flex;align-items:center;gap:5px}
@@ -28,7 +28,7 @@ body{font-family:'Amiri',system-ui,Tahoma,sans-serif;background:var(--bg);color:
 .custom-label{flex:1;font-size:12px;color:var(--tx)}
 .custom-unit{font-size:11px;color:var(--mu);min-width:30px}
 .custom-pts{font-size:11px;color:#1a6b3c;font-weight:600;min-width:55px;text-align:left}
-.custom-inp{width:60px;border:1.5px solid #f0c040;border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;font-family:inherit;background:#fff;color:var(--tx);outline:none;-moz-appearance:textfield}
+.custom-inp{width:60px;border:1.5px solid #ddd5e4;border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;font-family:inherit;background:#fff;color:var(--tx);outline:none;-moz-appearance:textfield}
 .custom-inp:focus{border-color:#b8860b}
 .nr label{font-size:13px;color:var(--mu);font-weight:500}
 .nr input{border:1.5px solid var(--bd);border-radius:8px;padding:6px 12px;font-family:inherit;font-size:13px;background:var(--sf);color:var(--tx);width:180px;text-align:right;outline:none}
@@ -155,7 +155,7 @@ var _ls=(function(){
 })();
 var SNK='dhulhijja_notes_v1';
 var CK='dhulhijja_custom_v1';
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxELLJQlPz2zaFObOJGMBf62jSEecSMsmx4pozqW2NXiFZKGmpon6hbNHLgsIrtU9Zt/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzcyt_3E0tnQixJiN5_Ge2rKzsW48hIpi5eWxJEjjqhQmvq2sGeipK93U2mQr3Mwiud/exec';
 const ROWS=[
   {cat:'القرآن',ibada:'البقرة',pts:10},
   {cat:'القرآن',ibada:'جزء قرآن',pts:10,customIdx:0},
@@ -230,7 +230,7 @@ function buildNotesRow(tb){
     nlbl.textContent='ملاحظة اليوم';tnr.appendChild(nlbl);
     const saved=getSavedNotes();
     for(let d=1;d<=DAYS;d++){
-      const td=document.createElement('td');td.style.cssText='background:#fff9e6;padding:2px;border:1px solid #f0c040';
+      const td=document.createElement('td');td.style.cssText='background:#fff9e6;padding:2px;border:1px solid #ddd5e4';
       if(saved[d]){td.innerHTML='<div style="font-size:8px;color:#856404;text-align:center;padding:2px;line-height:1.2;overflow:hidden;max-height:28px" title="'+saved[d].text+'">'+saved[d].text.substring(0,6)+'</div>';}
       else{const btn=document.createElement('button');btn.textContent='+';btn.style.cssText='width:100%;height:28px;background:none;border:none;color:#b8860b;font-size:16px;cursor:pointer;font-weight:700';const day=d;btn.onclick=function(){openNoteModal(day);};td.appendChild(btn);}
       tnr.appendChild(td);
@@ -245,7 +245,8 @@ function build(){
     const tr=document.createElement('tr');
     if(r.cat!==lastCat){const span=ROWS.filter(x=>x.cat===r.cat).length;const td=document.createElement('td');td.className='cc';td.rowSpan=span;const abbr={'القرآن':'قرآن','القيام':'قيام','الصلاة':'صلاة','الذكر':'ذكر'};td.textContent=abbr[r.cat]||r.cat;tr.appendChild(td);lastCat=r.cat;}
     const ti=document.createElement('td');ti.className='ic';
-    ti.textContent=r.ibada;
+    if(r.customIdx!==undefined){const _def=CUSTOM_DEFS[r.customIdx];const _cs=getCustomSettings();const _val=(_cs&&_cs[r.customIdx]!=null)?_cs[r.customIdx]:_def.defaultVal;const _base=_def.baseName||r.ibada;ti.textContent=_val+' '+_base;}
+    else{ti.textContent=r.ibada;}
     tr.appendChild(ti);
     const tp=document.createElement('td');tp.className='pc';tp.id='pts_'+ri;tp.textContent=r.pts;tr.appendChild(tp);
     for(let d=1;d<=DAYS;d++){const tc=document.createElement('td');tc.className='cell';applyCell(tc,state[sk(ri,d)]||0);tc.onclick=()=>toggle(ri,d,tc);tr.appendChild(tc);}
@@ -281,7 +282,7 @@ function buildCustomSettings(){
         document.getElementById('cp_'+i).textContent='= '+p+' نقطة';
         const arr=CUSTOM_DEFS.map((d,j)=>{if(d.type==='choice'){return saved?saved[j]:0;}const el=document.getElementById('ci_'+j);return el?parseInt(el.value)||0:(saved?saved[j]:0);});
         saveCustomSettings(arr);
-        ROWS.forEach((r,ri)=>{if(r.customIdx===i){r.pts=p;const el=document.getElementById('pts_'+ri);if(r.dynamicName){const n2=parseInt(document.getElementById('ci_'+i).value)||0;const ti=document.querySelector('#tbody tr:nth-child('+(ri+1)+') td.ic');if(ti)ti.textContent=n2+' '+r.ibada;}if(el)el.textContent=r.pts;}});
+        ROWS.forEach((r,ri)=>{if(r.customIdx===i){r.pts=p;const el=document.getElementById('pts_'+ri);if(el)el.textContent=r.pts;const trs=document.getElementById('tbody').rows;if(trs[ri]){const ti=trs[ri].querySelector('td.ic');if(ti){const _def=CUSTOM_DEFS[i];const _base=_def.baseName||r.ibada;ti.textContent=n+' '+_base;}}}});
         recalc();
       };return;
     }
