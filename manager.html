@@ -20,8 +20,8 @@
 <div id="main"><div class="empty">🌿<br>اضغطي "تحديث" لتحميل نتائج البنات</div></div>
 <div id="toast"></div>
 <script>
-const SHEET_ID='1uTBnW0HxRRW946rpUIPlgVUiKbdeVmsPChhh01HZIvA';
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxELLJQlPz2zaFObOJGMBf62jSEecSMsmx4pozqW2NXiFZKGmpon6hbNHLgsIrtU9Zt/exec';
+const SHEET_ID='1Xy0Yr7jSxCpozMz8b93CifgoD8oPKSMdk-6dmZoxbRg';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzcyt_3E0tnQixJiN5_Ge2rKzsW48hIpi5eWxJEjjqhQmvq2sGeipK93U2mQr3Mwiud/exec';
 const DAYS=9;
 const ROWS=[
   {cat:'القرآن',ibada:'البقرة',pts:10},
@@ -29,25 +29,25 @@ const ROWS=[
   {cat:'القيام',ibada:'قيام ساعة',pts:5},
   {cat:'القيام',ibada:'قيام ساعتين',pts:10},
   {cat:'القيام',ibada:'قيام 3 ساعات',pts:15},
-  {cat:'الصلاة',ibada:'ركعات ضحى',pts:1,customIdx:1,dynamicName:true},
-  {cat:'الصلاة',ibada:'ركعات أوابين',pts:1,customIdx:2,dynamicName:true},
+  {cat:'الصلاة',ibada:'ركعات ضحى',pts:6,customIdx:1,dynamicName:true},
+  {cat:'الصلاة',ibada:'ركعات أوابين',pts:6,customIdx:2,dynamicName:true},
   {cat:'الصلاة',ibada:'قضاء يوم',pts:5},
   {cat:'الصلاة',ibada:'فرضين جماعة',pts:4},
   {cat:'الصلاة',ibada:'3+ فروض جماعة',pts:2},
-  {cat:'الذكر',ibada:'صلاة على الرسول',pts:5,customIdx:3,ptsDiv:1000,note:'أدنى ١٠٠٠/يوم'},
-  {cat:'الذكر',ibada:'استغفار',pts:5,customIdx:4,ptsDiv:1000,note:'أدنى ١٠٠٠/يوم'},
-  {cat:'الذكر',ibada:'تهليل',pts:5,customIdx:5,ptsDiv:2500,note:'أدنى ٢٥٠٠/يوم'},
-  {cat:'الذكر',ibada:'سبحان الله وبحمده',pts:2,customIdx:6,ptsDiv:50,note:'أدنى ١٠٠/يوم'},
+  {cat:'الذكر',ibada:'صلاة على الرسول',pts:20,customIdx:3,ptsDiv:500,note:'أدنى ١٠٠٠/يوم'},
+  {cat:'الذكر',ibada:'استغفار',pts:20,customIdx:4,ptsDiv:500,note:'أدنى ١٠٠٠/يوم'},
+  {cat:'الذكر',ibada:'تهليل',pts:50,customIdx:5,ptsDiv:500,note:'أدنى ٢٥٠٠/يوم'},
+  {cat:'الذكر',ibada:'سبحان الله وبحمده',pts:5,customIdx:6,ptsDiv:100,note:'أدنى ١٠٠/يوم'},
   {cat:'صدقة',ibada:'صدقة يومية',pts:1}
 ];
 const CUSTOM_DEFS=[
-  {ibada:'جزء قرآن',ptsPerUnit:10,unit:'جزء/يوم',defaultVal:3,minVal:3},
-  {ibada:'ركعات ضحى',ptsPerUnit:1,unit:'ركعة/يوم',defaultVal:6,minVal:6},
-  {ibada:'ركعات أوابين',ptsPerUnit:1,unit:'ركعة/يوم',defaultVal:6,minVal:6},
-  {ibada:'صلاة على الرسول',ptsPerUnit:5,unit:'مرة/يوم',defaultVal:1000,ptsDiv:1000,minVal:1000},
-  {ibada:'استغفار',ptsPerUnit:5,unit:'مرة/يوم',defaultVal:1000,ptsDiv:1000,minVal:1000},
-  {ibada:'تهليل',ptsPerUnit:5,unit:'مرة/يوم',defaultVal:2500,ptsDiv:2500,minVal:2500},
-  {ibada:'سبحان الله وبحمده',ptsPerUnit:2,unit:'مرة/يوم',defaultVal:100,ptsDiv:50,minVal:100}
+  {ibada:'جزء قرآن',ptsPerUnit:10,unit:'جزء/يوم',defaultVal:3,minVal:3,baseName:'جزء قرآن'},
+  {ibada:'ركعات ضحى',ptsPerUnit:1,unit:'ركعة/يوم',defaultVal:6,minVal:6,baseName:'ركعات ضحى'},
+  {ibada:'ركعات أوابين',ptsPerUnit:1,unit:'ركعة/يوم',defaultVal:6,minVal:6,baseName:'ركعات أوابين'},
+  {ibada:'صلاة على الرسول',ptsPerUnit:10,unit:'مرة/يوم',defaultVal:1000,ptsDiv:500,minVal:1000,baseName:'صلاة على الرسول'},
+  {ibada:'استغفار',ptsPerUnit:10,unit:'مرة/يوم',defaultVal:1000,ptsDiv:500,minVal:1000,baseName:'استغفار'},
+  {ibada:'تهليل',ptsPerUnit:10,unit:'مرة/يوم',defaultVal:2500,ptsDiv:500,minVal:2500,baseName:'تهليل'},
+  {ibada:'سبحان الله وبحمده',ptsPerUnit:5,unit:'مرة/يوم',defaultVal:100,ptsDiv:100,minVal:100,baseName:'سبحان الله وبحمده'}
 ];
 const AMAL=[
   {name:'⭐ الاعتكاف من الفجر حتى الشروق',pts:10},
@@ -86,7 +86,7 @@ function readJSON(v,fb){try{return v?JSON.parse(v):fb}catch(e){return fb}}
 function getCustomValue(g,i){var def=CUSTOM_DEFS[i];var v=(g.customSettings&&g.customSettings[i]!=null)?g.customSettings[i]:undefined;if(def&&def.type==='choice')return v==null?0:Number(v);return Number(v==null?(def?def.defaultVal:0):v)||0;}
 function customLabel(g,i){var def=CUSTOM_DEFS[i];if(!def)return '';var v=getCustomValue(g,i);if(def.type==='choice'){var c=def.choices[v]||def.choices[0];return def.ibada+': '+c.label+' = '+c.pts+' نقطة';}return def.ibada+': '+v+' '+def.unit;}
 function rowPts(g,r){if(r.customIdx==null)return r.pts;var def=CUSTOM_DEFS[r.customIdx];var v=getCustomValue(g,r.customIdx);if(def.type==='choice')return (def.choices[v]||def.choices[0]).pts;if(def.minVal&&v<def.minVal)return 0;return Math.floor(v/(def.ptsDiv||1))*def.ptsPerUnit;}
-function rowName(g,r){if(r.customIdx==null)return r.ibada;var def=CUSTOM_DEFS[r.customIdx];var v=getCustomValue(g,r.customIdx);if(def.type==='choice')return r.ibada+' — '+(def.choices[v]||def.choices[0]).label;if(r.dynamicName)return v+' '+r.ibada;return r.ibada+' — '+v+' '+def.unit;}
+function rowName(g,r){if(r.customIdx==null)return r.ibada;var def=CUSTOM_DEFS[r.customIdx];var v=getCustomValue(g,r.customIdx);if(def.type==='choice')return r.ibada+' — '+(def.choices[v]||def.choices[0]).label;var base=def.baseName||r.ibada;return v+' '+base;}
 function rowEarned(g,ri){var r=ROWS[ri],pts=rowPts(g,r),total=0;for(var d=1;d<=DAYS;d++)if(((g.state||{})[sk(ri,d)]||0)===1)total+=pts;return total;}
 async function loadData(){
   const btn=document.getElementById('refreshBtn');btn.textContent='جاري التحميل...';btn.classList.add('loading');btn.disabled=true;
@@ -153,7 +153,7 @@ function girlCard(g,gi,sorted,maxG){
     +'<div class="mini-panel" id="amalPanel_'+gi+'">'+aml+'</div>'
     +'<button class="section-btn" onclick="togglePanel(\'duaaPanel_'+gi+'\',this)"><span>🤲 خانة الدعاء</span><span>▼</span></button>'
     +'<div class="mini-panel" id="duaaPanel_'+gi+'">'+du+'</div>'
-    +'<button class="section-btn" onclick="togglePanel(\'siyamPanel_'+gi+'\',this)"><span>🌙 الصيام</span><span>▼</span></button>'
+    +'<button class="section-btn" onclick="togglePanel(\'siyamPanel_'+gi+'\',this)"><span>🌙 الصيام وقراءة أسماء الله الحسنى</span><span>▼</span></button>'
     +'<div class="mini-panel" id="siyamPanel_'+gi+'">'+sy+'</div>'
     +'</div></div>';
 }
@@ -177,13 +177,7 @@ function duaaHtml(g){
 function siyamHtml(g){
   const data=g.siyam||{};let earned=0;for(let d=1;d<=9;d++)if(data['siyam-'+d])earned++;
   let html='<div class="custom-box"><div class="custom-title">🌙 الصيام: '+earned+'/9 يوم ('+earned*10+' نقطة)</div>';
-  for(let d=1;d<=9;d++){
-    const fasted=!!data['siyam-'+d];
-    if(!fasted)continue;
-    html+='<div class="duaa-day"><div class="duaa-title">اليوم '+d;
-    html+=' <span style="background:#d4f4e2;color:#1a6b3c;font-size:9px;padding:1px 6px;border-radius:8px;font-weight:700">🌙 صائمة</span>';
-    html+='</div></div>';
-  }
+  for(let d=1;d<=9;d++){const fasted=!!data['siyam-'+d];if(!fasted)continue;html+='<div class="duaa-day"><div class="duaa-title">اليوم '+d+' <span style="background:#d4f4e2;color:#1a6b3c;font-size:9px;padding:1px 6px;border-radius:8px;font-weight:700">🌙 صائمة</span></div></div>';}
   if(earned===0) html+='<div style="font-size:10px;color:#aaa">لا يوجد بيانات بعد</div>';
   return html+'</div>';
 }
