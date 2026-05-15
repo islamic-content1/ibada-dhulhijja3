@@ -85,7 +85,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){retur
 function readJSON(v,fb){try{return v?JSON.parse(v):fb}catch(e){return fb}}
 function getCustomValue(g,i){var def=CUSTOM_DEFS[i];var v=(g.customSettings&&g.customSettings[i]!=null)?g.customSettings[i]:undefined;if(def&&def.type==='choice')return v==null?0:Number(v);return Number(v==null?(def?def.defaultVal:0):v)||0;}
 function customLabel(g,i){var def=CUSTOM_DEFS[i];if(!def)return '';var v=getCustomValue(g,i);if(def.type==='choice'){var c=def.choices[v]||def.choices[0];return def.ibada+': '+c.label+' = '+c.pts+' نقطة';}return def.ibada+': '+v+' '+def.unit;}
-function rowPts(g,r){if(r.customIdx==null)return r.pts;var def=CUSTOM_DEFS[r.customIdx];var v=getCustomValue(g,r.customIdx);if(def.type==='choice')return (def.choices[v]||def.choices[0]).pts;if(def.minVal&&v<def.minVal)return 0;return Math.floor(v/(def.ptsDiv||1))*def.ptsPerUnit;}
+function rowPts(g,r){if(r.customIdx==null)return r.pts;var def=CUSTOM_DEFS[r.customIdx];var v=getCustomValue(g,r.customIdx);if(def.type==='choice')return (def.choices[v]||def.choices[0]).pts;if(def.minVal&&v<def.minVal)return 0;return (v/(def.ptsDiv||1))*def.ptsPerUnit;}
 function rowName(g,r){if(r.customIdx==null)return r.ibada;var def=CUSTOM_DEFS[r.customIdx];var v=getCustomValue(g,r.customIdx);if(def.type==='choice')return r.ibada+' — '+(def.choices[v]||def.choices[0]).label;var base=def.baseName||r.ibada;return v+' '+base;}
 function rowEarned(g,ri){var r=ROWS[ri],pts=rowPts(g,r),total=0;for(var d=1;d<=DAYS;d++)if(((g.state||{})[sk(ri,d)]||0)===1)total+=pts;return total;}
 async function loadData(){
