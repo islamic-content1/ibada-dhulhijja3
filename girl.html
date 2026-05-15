@@ -167,20 +167,20 @@ const ROWS=[
   {cat:'الصلاة',ibada:'قضاء يوم',pts:5},
   {cat:'الصلاة',ibada:'فرضين جماعة',pts:4},
   {cat:'الصلاة',ibada:'3+ فروض جماعة',pts:2},
-  {cat:'الذكر',ibada:'صلاة على الرسول',pts:20,customIdx:3,ptsDiv:1000,note:'أدنى ١٠٠٠ باليوم'},
-  {cat:'الذكر',ibada:'استغفار',pts:20,customIdx:4,ptsDiv:1000,note:'أدنى ١٠٠٠ باليوم'},
-  {cat:'الذكر',ibada:'تهليل',pts:50,customIdx:5,ptsDiv:2500,note:'أدنى ٢٥٠٠ باليوم'},
-  {cat:'الذكر',ibada:'سبحان الله وبحمده',pts:5,customIdx:6,ptsDiv:50,note:'أدنى ١٠٠ باليوم'},
+  {cat:'الذكر',ibada:'صلاة على الرسول',pts:20,customIdx:3,ptsDiv:500,note:'أدنى ١٠٠٠ باليوم'},
+  {cat:'الذكر',ibada:'استغفار',pts:20,customIdx:4,ptsDiv:500,note:'أدنى ١٠٠٠ باليوم'},
+  {cat:'الذكر',ibada:'تهليل',pts:50,customIdx:5,ptsDiv:500,note:'أدنى ٢٥٠٠ باليوم'},
+  {cat:'الذكر',ibada:'سبحان الله وبحمده',pts:5,customIdx:6,ptsDiv:100,note:'أدنى ١٠٠ باليوم'},
   {cat:'صدقة',ibada:'صدقة يومية',pts:1},
 ];
 const CUSTOM_DEFS=[
   {ibada:'جزء قرآن',ptsPerUnit:10,unit:'جزء/يوم',max:30,defaultVal:3,minVal:3,note:'أدنى ٣ أجزاء/يوم'},
   {ibada:'ركعات ضحى',ptsPerUnit:1,unit:'ركعة/يوم',max:20,defaultVal:6,minVal:6,dynamicName:true,baseName:'ركعات ضحى',note:'أدنى ٦ ركعات'},
   {ibada:'ركعات أوابين',ptsPerUnit:1,unit:'ركعة/يوم',max:12,defaultVal:6,minVal:6,dynamicName:true,baseName:'ركعات أوابين',note:'أدنى ٦ ركعات'},
-  {ibada:'صلاة على الرسول',ptsPerUnit:5,unit:'/يوم',max:5000,defaultVal:1000,ptsDiv:1000,minVal:1000,note:'أدنى ١٠٠٠ باليوم'},
-  {ibada:'استغفار',ptsPerUnit:5,unit:'/يوم',max:5000,defaultVal:1000,ptsDiv:1000,minVal:1000,note:'أدنى ١٠٠٠ باليوم'},
-  {ibada:'تهليل',ptsPerUnit:5,unit:'/يوم',max:10000,defaultVal:2500,ptsDiv:2500,minVal:2500,note:'أدنى ٢٥٠٠ باليوم'},
-  {ibada:'سبحان الله وبحمده',ptsPerUnit:2,unit:'/يوم',max:1000,defaultVal:100,ptsDiv:50,minVal:100,note:'أدنى ١٠٠ باليوم'},
+  {ibada:'صلاة على الرسول',ptsPerUnit:10,unit:'/يوم',max:5000,defaultVal:1000,ptsDiv:500,minVal:1000,note:'أدنى ١٠٠٠ باليوم'},
+  {ibada:'استغفار',ptsPerUnit:10,unit:'/يوم',max:5000,defaultVal:1000,ptsDiv:500,minVal:1000,note:'أدنى ١٠٠٠ باليوم'},
+  {ibada:'تهليل',ptsPerUnit:10,unit:'/يوم',max:10000,defaultVal:2500,ptsDiv:500,minVal:2500,note:'أدنى ٢٥٠٠ باليوم'},
+  {ibada:'سبحان الله وبحمده',ptsPerUnit:5,unit:'/يوم',max:1000,defaultVal:100,ptsDiv:100,minVal:100,note:'أدنى ١٠٠ باليوم'},
 ];
 const AMAL=[
   {name:'⭐ الاعتكاف من الفجر حتى الشروق',pts:10,hadith:'قال رسول الله ﷺ: «مَن صلّى الفجرَ في جماعة، ثم قعد يذكرُ اللهَ حتى تطلعَ الشمس، ثم صلّى ركعتين، كانت له كأجرِ حجّةٍ وعمرةٍ تامّةٍ تامّةٍ تامّة»'},
@@ -271,14 +271,14 @@ function buildCustomSettings(){
       row.innerHTML=`<span class="custom-label">${def.ibada}</span><div style="display:flex;gap:4px">${btnsHtml}</div><span class="custom-pts" id="cp_${i}">= ${pts} نقطة</span>`;
     }else{
       const val=saved?saved[i]:def.defaultVal;
-      const pts=(def.minVal&&val<def.minVal)?0:Math.floor(val/(def.ptsDiv||1))*def.ptsPerUnit;
+      const pts=(def.minVal&&val<def.minVal)?0:(val/(def.ptsDiv||1))*def.ptsPerUnit;
       const noteHtml=def.note?'<div style="font-size:9px;color:#856404">'+def.note+'</div>':'';
       row.innerHTML=`<span class="custom-label">${def.ibada}${noteHtml}</span><input type="number" class="custom-inp" id="ci_${i}" value="${val}" min="0" max="${def.max||999}" placeholder="${def.defaultVal||0}"><span class="custom-unit">${def.unit||''}</span><span class="custom-pts" id="cp_${i}">= ${pts} نقطة</span>`;
       box.appendChild(row);
       const inp=document.getElementById('ci_'+i);
       inp.oninput=function(){
         const n=parseInt(this.value)||0;
-        const def2=CUSTOM_DEFS[i];const p=(def2.minVal&&n<def2.minVal)?0:Math.floor(n/(def2.ptsDiv||1))*def2.ptsPerUnit;
+        const def2=CUSTOM_DEFS[i];const p=(def2.minVal&&n<def2.minVal)?0:(n/(def2.ptsDiv||1))*def2.ptsPerUnit;
         document.getElementById('cp_'+i).textContent='= '+p+' نقطة';
         const arr=CUSTOM_DEFS.map((d,j)=>{if(d.type==='choice'){return saved?saved[j]:0;}const el=document.getElementById('ci_'+j);return el?parseInt(el.value)||0:(saved?saved[j]:0);});
         saveCustomSettings(arr);
@@ -300,7 +300,7 @@ function setChoice(ci,choiceIdx,pts){
 }
 function initCustomPts(){
   const saved=getCustomSettings();if(!saved)return;
-  ROWS.forEach((r,ri)=>{if(r.customIdx!==undefined){const def=CUSTOM_DEFS[r.customIdx];const val=saved[r.customIdx]||0;if(def.type==='choice'){r.pts=def.choices[val]?def.choices[val].pts:def.choices[0].pts;}else{r.pts=(def.minVal&&val<def.minVal)?0:Math.floor(val/(def.ptsDiv||1))*def.ptsPerUnit;}}});
+  ROWS.forEach((r,ri)=>{if(r.customIdx!==undefined){const def=CUSTOM_DEFS[r.customIdx];const val=saved[r.customIdx]||0;if(def.type==='choice'){r.pts=def.choices[val]?def.choices[val].pts:def.choices[0].pts;}else{r.pts=(def.minVal&&val<def.minVal)?0:(val/(def.ptsDiv||1))*def.ptsPerUnit;}}});
 }
 function getDayTotals(){return Array.from({length:DAYS},(_,i)=>{let t=0;ROWS.forEach((r,ri)=>{if((state[sk(ri,i+1)]||0)===1)t+=r.pts});return t;});}
 function recalc(){
