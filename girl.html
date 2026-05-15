@@ -28,7 +28,7 @@ body{font-family:'Amiri',system-ui,Tahoma,sans-serif;background:var(--bg);color:
 .custom-label{flex:1;font-size:12px;color:var(--tx)}
 .custom-unit{font-size:11px;color:var(--mu);min-width:30px}
 .custom-pts{font-size:11px;color:#1a6b3c;font-weight:600;min-width:55px;text-align:left}
-.custom-inp{width:60px;border:1.5px solid #ddd5e4;border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;font-family:inherit;background:#fff;color:var(--tx);outline:none;-moz-appearance:textfield}
+.custom-inp{width:60px;border:1.5px solid #f0c040;border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;font-family:inherit;background:#fff;color:var(--tx);outline:none;-moz-appearance:textfield}
 .custom-inp:focus{border-color:#b8860b}
 .nr label{font-size:13px;color:var(--mu);font-weight:500}
 .nr input{border:1.5px solid var(--bd);border-radius:8px;padding:6px 12px;font-family:inherit;font-size:13px;background:var(--sf);color:var(--tx);width:180px;text-align:right;outline:none}
@@ -230,7 +230,7 @@ function buildNotesRow(tb){
     nlbl.textContent='ملاحظة اليوم';tnr.appendChild(nlbl);
     const saved=getSavedNotes();
     for(let d=1;d<=DAYS;d++){
-      const td=document.createElement('td');td.style.cssText='background:#fff9e6;padding:2px;border:1px solid #ddd5e4';
+      const td=document.createElement('td');td.style.cssText='background:#fff9e6;padding:2px;border:1px solid #f0c040';
       if(saved[d]){td.innerHTML='<div style="font-size:8px;color:#856404;text-align:center;padding:2px;line-height:1.2;overflow:hidden;max-height:28px" title="'+saved[d].text+'">'+saved[d].text.substring(0,6)+'</div>';}
       else{const btn=document.createElement('button');btn.textContent='+';btn.style.cssText='width:100%;height:28px;background:none;border:none;color:#b8860b;font-size:16px;cursor:pointer;font-weight:700';const day=d;btn.onclick=function(){openNoteModal(day);};td.appendChild(btn);}
       tnr.appendChild(td);
