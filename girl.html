@@ -277,7 +277,7 @@ function buildCustomSettings(){
       row.innerHTML=`<span class="custom-label">${def.ibada}</span><div style="display:flex;gap:4px">${btnsHtml}</div><span class="custom-pts" id="cp_${i}">= ${pts} نقطة</span>`;
     }else{
       const val=saved?saved[i]:def.defaultVal;
-      const pts=(val/(def.ptsDiv||1))*def.ptsPerUnit;
+      const pts=(def.ptsDiv?Math.floor(val/100)*100:val)/(def.ptsDiv||1)*def.ptsPerUnit;
       const noteHtml=def.note?'<div style="font-size:9px;color:#856404">'+def.note+'</div>':'';
       row.innerHTML=`<span class="custom-label">${def.ibada}${noteHtml}</span><input type="number" class="custom-inp" id="ci_${i}" value="${val}" min="0" max="${def.max||999}" placeholder="${def.defaultVal||0}"><span class="custom-unit">${def.unit||''}</span><span class="custom-pts" id="cp_${i}">= ${pts} نقطة</span>`;
       if(i===3)box.appendChild(dhikrNote),dhikrNote.style.display='block';
@@ -285,7 +285,7 @@ function buildCustomSettings(){
       const inp=document.getElementById('ci_'+i);
       inp.oninput=function(){
         const n=parseInt(this.value)||0;
-        const def2=CUSTOM_DEFS[i];const p=(n/(def2.ptsDiv||1))*def2.ptsPerUnit;
+        const def2=CUSTOM_DEFS[i];const p=(def2.ptsDiv?Math.floor(n/100)*100:n)/(def2.ptsDiv||1)*def2.ptsPerUnit;
         document.getElementById('cp_'+i).textContent='= '+p+' نقطة';
         const arr=CUSTOM_DEFS.map((d,j)=>{if(d.type==='choice'){return saved?saved[j]:0;}const el=document.getElementById('ci_'+j);return el?parseInt(el.value)||0:(saved?saved[j]:0);});
         saveCustomSettings(arr);
@@ -307,7 +307,7 @@ function setChoice(ci,choiceIdx,pts){
 }
 function initCustomPts(){
   const saved=getCustomSettings();if(!saved)return;
-  ROWS.forEach((r,ri)=>{if(r.customIdx!==undefined){const def=CUSTOM_DEFS[r.customIdx];const val=saved[r.customIdx]||0;if(def.type==='choice'){r.pts=def.choices[val]?def.choices[val].pts:def.choices[0].pts;}else{r.pts=(val/(def.ptsDiv||1))*def.ptsPerUnit;}}});
+  ROWS.forEach((r,ri)=>{if(r.customIdx!==undefined){const def=CUSTOM_DEFS[r.customIdx];const val=saved[r.customIdx]||0;if(def.type==='choice'){r.pts=def.choices[val]?def.choices[val].pts:def.choices[0].pts;}else{r.pts=(def.ptsDiv?Math.floor(val/100)*100:val)/(def.ptsDiv||1)*def.ptsPerUnit;}}});
 }
 function getDayTotals(){return Array.from({length:DAYS},(_,i)=>{let t=0;ROWS.forEach((r,ri)=>{if((state[sk(ri,i+1)]||0)===1)t+=r.pts});return t;});}
 function recalc(){
