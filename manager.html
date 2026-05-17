@@ -13,25 +13,25 @@
 </style>
 </head>
 <body>
-<div class="hdr"><div class="bsm">بسم الله الرحمن الرحيم</div><h1>🌙 النتائج</h1><p> أداء البنات في عشرة ذي الحجة</p></div>
-<div class="stats"><div class="sc"><div class="sv" id="stTotal">0</div><div class="sl">عدد البنات</div></div><div class="sc"><div class="sv" id="stTop">—</div><div class="sl">أعلى مجموع</div></div><div class="sc"><div class="sv" id="stAvg">—</div><div class="sl">متوسط المجموعة</div></div></div>
+<div class="hdr"><div class="bsm">بسم الله الرحمن الرحيم</div><h1>🌙 النتائج</h1><p> أداء الآنسات في عشرة ذي الحجة</p></div>
+<div class="stats"><div class="sc"><div class="sv" id="stTotal">0</div><div class="sl">عدد الآنسات</div></div><div class="sc"><div class="sv" id="stTop">—</div><div class="sl">أعلى مجموع</div></div><div class="sc"><div class="sv" id="stAvg">—</div><div class="sl">متوسط المجموعة</div></div></div>
 <div class="btns"><button class="btn btn-r" id="refreshBtn" onclick="loadData()">↻ تحديث النتائج</button><button class="btn btn-x" onclick="exportExcel()">⬇ Excel</button></div>
 <div class="last-up" id="lastUp"></div>
-<div id="main"><div class="empty">🌿<br>اضغطي "تحديث" لتحميل نتائج البنات</div></div>
+<div id="main"><div class="empty">🌿<br>اضغطي "تحديث" لتحميل نتائج الآنسات</div></div>
 <div id="toast"></div>
 <script>
 const SHEET_ID='1uTBnW0HxRRW946rpUIPlgVUiKbdeVmsPChhh01HZIvA';
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxELLJQlPz2zaFObOJGMBf62jSEecSMsmx4pozqW2NXiFZKGmpon6hbNHLgsIrtU9Zt/exec';
 const DAYS=9;
 const ROWS=[
-  {cat:'القرآن',ibada:'البقرة',pts:20},
-  {cat:'القرآن',ibada:'جزء قرآن',pts:10,customIdx:0},
+  {cat:'القرآن',ibada:'البقرة',pts:20,badil:'ورد يا لطيف'},
+  {cat:'القرآن',ibada:'جزء قرآن',pts:30,customIdx:0,badil:'كل جزء = ١٠ أسماء الله الحسنى'},
   {cat:'القيام',ibada:'قيام ساعة',pts:5},
   {cat:'القيام',ibada:'قيام ساعتين',pts:10},
   {cat:'القيام',ibada:'قيام 3 ساعات',pts:15},
-  {cat:'الصلاة',ibada:'ركعات ضحى',pts:6,customIdx:1,dynamicName:true},
-  {cat:'الصلاة',ibada:'ركعات أوابين',pts:6,customIdx:2,dynamicName:true},
-  {cat:'الصلاة',ibada:'قضاء يوم',pts:5},
+  {cat:'الصلاة',ibada:'ركعات ضحى',pts:6,customIdx:1,dynamicName:true,badil:'صيغ الاستغفار (عن ركعات الضحى والأوابين معاً)'},
+  {cat:'الصلاة',ibada:'ركعات أوابين',pts:6,customIdx:2,dynamicName:true,badil:'صيغ الاستغفار (عن ركعات الضحى والأوابين معاً)'},
+  {cat:'الصلاة',ibada:'قضاء يوم',pts:5,badil:'٥٠ يا حي يا قيوم برحمتك أستغيث'},
   {cat:'الصلاة',ibada:'فرضين جماعة',pts:4},
   {cat:'الصلاة',ibada:'3+ فروض جماعة',pts:2},
   {cat:'الذكر',ibada:'صلاة على الرسول',pts:20,customIdx:3,ptsDiv:500,note:'أدنى ١٠٠٠/يوم'},
@@ -41,13 +41,13 @@ const ROWS=[
   {cat:'صدقة',ibada:'صدقة يومية',pts:1}
 ];
 const CUSTOM_DEFS=[
-  {ibada:'جزء قرآن',ptsPerUnit:10,unit:'جزء/يوم',defaultVal:3,minVal:3,baseName:'جزء قرآن'},
-  {ibada:'ركعات ضحى',ptsPerUnit:1,unit:'ركعة/يوم',defaultVal:6,minVal:6,baseName:'ركعات ضحى'},
-  {ibada:'ركعات أوابين',ptsPerUnit:1,unit:'ركعة/يوم',defaultVal:6,minVal:6,baseName:'ركعات أوابين'},
-  {ibada:'صلاة على الرسول',ptsPerUnit:10,unit:'مرة/يوم',defaultVal:1000,ptsDiv:500,minVal:1000,baseName:'صلاة على الرسول'},
-  {ibada:'استغفار',ptsPerUnit:10,unit:'مرة/يوم',defaultVal:1000,ptsDiv:500,minVal:1000,baseName:'استغفار'},
-  {ibada:'تهليل',ptsPerUnit:10,unit:'مرة/يوم',defaultVal:2500,ptsDiv:500,minVal:2500,baseName:'تهليل'},
-  {ibada:'سبحان الله وبحمده',ptsPerUnit:5,unit:'مرة/يوم',defaultVal:100,ptsDiv:100,minVal:100,baseName:'سبحان الله وبحمده'}
+  {ibada:'جزء قرآن',ptsPerUnit:10,unit:'جزء/يوم',defaultVal:3,baseName:'جزء قرآن'},
+  {ibada:'ركعات ضحى',ptsPerUnit:1,unit:'ركعة/يوم',defaultVal:6,baseName:'ركعات ضحى'},
+  {ibada:'ركعات أوابين',ptsPerUnit:1,unit:'ركعة/يوم',defaultVal:6,baseName:'ركعات أوابين'},
+  {ibada:'صلاة على الرسول',ptsPerUnit:10,unit:'مرة/يوم (مضاعفات ١٠٠)',defaultVal:1000,ptsDiv:500,baseName:'صلاة على الرسول'},
+  {ibada:'استغفار',ptsPerUnit:10,unit:'مرة/يوم (مضاعفات ١٠٠)',defaultVal:1000,ptsDiv:500,baseName:'استغفار'},
+  {ibada:'تهليل',ptsPerUnit:10,unit:'مرة/يوم (مضاعفات ١٠٠)',defaultVal:2500,ptsDiv:500,baseName:'تهليل'},
+  {ibada:'سبحان الله وبحمده',ptsPerUnit:5,unit:'مرة/يوم (مضاعفات ١٠٠)',defaultVal:100,ptsDiv:100,baseName:'سبحان الله وبحمده'}
 ];
 const AMAL=[
   {name:'⭐ الاعتكاف من الفجر حتى الشروق',pts:10},
@@ -85,7 +85,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){retur
 function readJSON(v,fb){try{return v?JSON.parse(v):fb}catch(e){return fb}}
 function getCustomValue(g,i){var def=CUSTOM_DEFS[i];var v=(g.customSettings&&g.customSettings[i]!=null)?g.customSettings[i]:undefined;if(def&&def.type==='choice')return v==null?0:Number(v);return Number(v==null?(def?def.defaultVal:0):v)||0;}
 function customLabel(g,i){var def=CUSTOM_DEFS[i];if(!def)return '';var v=getCustomValue(g,i);if(def.type==='choice'){var c=def.choices[v]||def.choices[0];return def.ibada+': '+c.label+' = '+c.pts+' نقطة';}return def.ibada+': '+v+' '+def.unit;}
-function rowPts(g,r){if(r.customIdx==null)return r.pts;var def=CUSTOM_DEFS[r.customIdx];var v=getCustomValue(g,r.customIdx);if(def.type==='choice')return (def.choices[v]||def.choices[0]).pts;if(def.minVal&&v<def.minVal)return 0;return (v/(def.ptsDiv||1))*def.ptsPerUnit;}
+function rowPts(g,r){if(r.customIdx==null)return r.pts;var def=CUSTOM_DEFS[r.customIdx];var v=getCustomValue(g,r.customIdx);if(def.type==='choice')return (def.choices[v]||def.choices[0]).pts;return (v/(def.ptsDiv||1))*def.ptsPerUnit;}
 function rowName(g,r){if(r.customIdx==null)return r.ibada;var def=CUSTOM_DEFS[r.customIdx];var v=getCustomValue(g,r.customIdx);if(def.type==='choice')return r.ibada+' — '+(def.choices[v]||def.choices[0]).label;var base=def.baseName||r.ibada;return v+' '+base;}
 function rowEarned(g,ri){var r=ROWS[ri],pts=rowPts(g,r),total=0;for(var d=1;d<=DAYS;d++)if(((g.state||{})[sk(ri,d)]||0)===1)total+=pts;return total;}
 async function loadData(){
@@ -98,7 +98,7 @@ async function loadData(){
       const c=r.c;const dt=[];for(let i=4;i<13;i++)dt.push(c[i]?Number(c[i].v)||0:0);
       return {name:c[0].v,grand:c[1]?Number(c[1].v)||0:0,avg:c[2]?c[2].v:'—',filled:c[3]?c[3].v:0,dayTotals:dt,state:readJSON(c[15]&&c[15].v,{}),lastUpdate:c[16]&&c[16].v?c[16].v.toString():'',notes:readJSON(c[17]&&c[17].v,{}),customSettings:readJSON(c[19]&&c[19].v,[]),amal:readJSON(c[20]&&c[20].v,{}),duaa:readJSON(c[21]&&c[21].v,{}),siyam:readJSON(c[22]&&c[22].v,{})};
     });
-    document.getElementById('lastUp').textContent='آخر تحديث: '+new Date().toLocaleTimeString('ar');render();showToast('تم التحديث ✓ — '+girlsData.length+' بنت');
+    document.getElementById('lastUp').textContent='آخر تحديث: '+new Date().toLocaleTimeString('ar');render();showToast('تم التحديث ✓ — '+girlsData.length+' آنسة');
   }catch(e){console.error(e);showToast('خطأ في التحميل');}
   btn.textContent='↻ تحديث النتائج';btn.classList.remove('loading');btn.disabled=false;
 }
@@ -111,7 +111,7 @@ function render(){
   sorted.forEach((g,i)=>{const h=Math.round(g.grand/maxG*95);html+='<div class="bi"><div class="bv">'+g.grand+'</div><div class="bf" style="height:'+h+'px"></div><div class="bn">'+esc(g.name)+'</div></div>';});
   html+='</div></div><div class="card"><div class="card-t">🏅 الترتيب العام</div>';
   sorted.forEach((g,i)=>{const cls=i===0?'t1':i===1?'t2':i===2?'t3':'';const ncls=i===0?'r1':i===1?'r2':i===2?'r3':'';const medals=['🥇','🥈','🥉'];const pct=Math.round(g.grand/maxG*100);html+='<div class="rank-item '+cls+'"><div class="rnum '+ncls+'">'+(i<3?medals[i]:i+1)+'</div><div class="rinfo"><div class="rname">'+esc(g.name)+'</div><div class="rmeta">مجموع: '+g.grand+' | معدل: '+g.avg+' | أيام: '+g.filled+'/10</div><div class="rtrack"><div class="rfill" style="width:'+pct+'%"></div></div></div><div class="rpts">'+g.grand+'</div></div>';});
-  html+='</div>'+perIbadaRanking()+'<div class="card-t" style="margin-bottom:10px">👥 تفصيل أداء كل بنت</div>';
+  html+='</div>'+perIbadaRanking()+'<div class="card-t" style="margin-bottom:10px">👥 تفصيل أداء كل آنسة</div>';
   girlsData.forEach((g,gi)=>{html+=girlCard(g,gi,sorted,maxG);});
   cont.innerHTML=html;
 }
@@ -144,7 +144,7 @@ function girlCard(g,gi,sorted,maxG){
     +'<div style="display:flex;align-items:center;gap:8px"><div class="gc-pts">'+g.grand+' نقطة | معدل '+g.avg+'</div><span id="garr_'+gi+'" style="color:#a8e6c0;font-size:12px">▼</span></div>'
     +'</div>'
     +'<div class="gc-body" id="gbody_'+gi+'" style="display:none">'
-    +'<div class="custom-box"><div class="custom-title">⚙️ اختيارات وكميات البنت</div><div class="chips">'+chips+'</div></div>'
+    +'<div class="custom-box"><div class="custom-title">⚙️ اختيارات وكميات الآنسة</div><div class="chips">'+chips+'</div></div>'
     +'<div class="prog-row"><span>التقدم الكلي</span><span>'+pct+'%</span></div><div class="prog-t"><div class="prog-f" style="width:'+pct+'%"></div></div>'
     +'<div class="days-row">'+dots+'</div>'
     +'<button class="toggle-btn" onclick="toggleDetails('+gi+',this)"><span>عرض تفاصيل العبادات</span><span>▼</span></button>'
@@ -153,7 +153,7 @@ function girlCard(g,gi,sorted,maxG){
     +'<div class="mini-panel" id="amalPanel_'+gi+'">'+aml+'</div>'
     +'<button class="section-btn" onclick="togglePanel(\'duaaPanel_'+gi+'\',this)"><span>🤲 خانة الدعاء</span><span>▼</span></button>'
     +'<div class="mini-panel" id="duaaPanel_'+gi+'">'+du+'</div>'
-    +'<button class="section-btn" onclick="togglePanel(\'siyamPanel_'+gi+'\',this)"><span>🌙 الصيام</span><span>▼</span></button>'
+    +'<button class="section-btn" onclick="togglePanel(\'siyamPanel_'+gi+'\',this)"><span>🌙 الصيام وقراءة أسماء الله الحسنى</span><span>▼</span></button>'
     +'<div class="mini-panel" id="siyamPanel_'+gi+'">'+sy+'</div>'
     +'</div></div>';
 }
@@ -197,7 +197,7 @@ function exportExcel(){
   sorted.forEach((g,i)=>sum.push([i+1,g.name,g.grand,g.avg,g.filled,...(g.dayTotals||[]),CUSTOM_DEFS.map((_,j)=>customLabel(g,j)).join(' | '),g.lastUpdate||'']));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sum),'ملخص');
   girlsData.forEach(g=>{const d=[['الفئة','العبادة','النقاط',...Array.from({length:DAYS},(_,i)=>'يوم '+(i+1)),'المجموع']];ROWS.forEach((r,ri)=>{const pts=rowPts(g,r);let s=0;const row=[r.cat,rowName(g,r),pts];for(let day=1;day<=DAYS;day++){const v=((g.state||{})[sk(ri,day)]||0)===1?pts:0;row.push(v);s+=v;}row.push(s);d.push(row);});XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(d),String(g.name).slice(0,28));});
-  XLSX.writeFile(wb,'نتائج_البنات_٩_ذي_الحجة.xlsx');showToast('تم التصدير ✓');
+  XLSX.writeFile(wb,'نتائج_الآنسات_٩_ذي_الحجة.xlsx');showToast('تم التصدير ✓');
 }
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 loadData();
