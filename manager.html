@@ -34,10 +34,10 @@ const ROWS=[
   {cat:'الصلاة',ibada:'قضاء يوم',pts:5,badil:'٥٠ يا حي يا قيوم برحمتك أستغيث'},
   {cat:'الصلاة',ibada:'فرضين جماعة',pts:4},
   {cat:'الصلاة',ibada:'3+ فروض جماعة',pts:2},
-  {cat:'الذكر',ibada:'صلاة على الرسول',pts:20,customIdx:3,ptsDiv:500,note:'أدنى ١٠٠٠/يوم'},
-  {cat:'الذكر',ibada:'استغفار',pts:20,customIdx:4,ptsDiv:500,note:'أدنى ١٠٠٠/يوم'},
-  {cat:'الذكر',ibada:'تهليل',pts:50,customIdx:5,ptsDiv:500,note:'أدنى ٢٥٠٠/يوم'},
-  {cat:'الذكر',ibada:'سبحان الله وبحمده',pts:5,customIdx:6,ptsDiv:100,note:'أدنى ١٠٠/يوم'},
+  {cat:'الذكر',ibada:'صلاة على الرسول',pts:20,customIdx:3,ptsDiv:500},
+  {cat:'الذكر',ibada:'استغفار',pts:20,customIdx:4,ptsDiv:500},
+  {cat:'الذكر',ibada:'تهليل',pts:50,customIdx:5,ptsDiv:500},
+  {cat:'الذكر',ibada:'سبحان الله وبحمده',pts:5,customIdx:6,ptsDiv:100},
   {cat:'صدقة',ibada:'صدقة يومية',pts:1}
 ];
 const CUSTOM_DEFS=[
@@ -49,11 +49,12 @@ const CUSTOM_DEFS=[
   {ibada:'تهليل',ptsPerUnit:10,unit:'مرة/يوم (مضاعفات ١٠٠)',defaultVal:2500,ptsDiv:500,baseName:'تهليل'},
   {ibada:'سبحان الله وبحمده',ptsPerUnit:5,unit:'مرة/يوم (مضاعفات ١٠٠)',defaultVal:100,ptsDiv:100,baseName:'سبحان الله وبحمده'}
 ];
+// ✅ شيل "فرضين جماعة" من AMAL
 const AMAL=[
   {name:'⭐ الاعتكاف من الفجر حتى الشروق',pts:10},
-  {name:'⭐ فرضين جماعة',pts:10},
   {name:'⭐ صلاة مقنطرين',pts:10},
   {name:'⭐ تحضير طبق وتقديمه للجارة',pts:10},
+  {name:'⭐ تدريس الأولاد',pts:10},
   {name:'إفطار صائم',pts:5},
   {name:'جبر خاطر الأم والأب',pts:5},
   {name:'البسملة قبل كل عمل',pts:5},
@@ -84,17 +85,22 @@ const sk=(r,d)=>r+'-'+d;
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function readJSON(v,fb){try{return v?JSON.parse(v):fb}catch(e){return fb}}
 function getCustomValue(g,i){var def=CUSTOM_DEFS[i];var v=(g.customSettings&&g.customSettings[i]!=null)?g.customSettings[i]:undefined;if(def&&def.type==='choice')return v==null?0:Number(v);return Number(v==null?(def?def.defaultVal:0):v)||0;}
-function customLabel(g,i){var def=CUSTOM_DEFS[i];if(!def)return '';var v=getCustomValue(g,i);if(def.type==='choice'){var c=def.choices[v]||def.choices[0];return def.ibada+': '+c.label+' = '+c.pts+' نقطة';}return def.ibada+': '+v+' '+def.unit;}
-function rowPts(g,r){if(r.customIdx==null)return r.pts;var def=CUSTOM_DEFS[r.customIdx];var v=getCustomValue(g,r.customIdx);if(def.type==='choice')return (def.choices[v]||def.choices[0]).pts;return (def.ptsDiv?Math.floor(v/100)*100:v)/(def.ptsDiv||1)*def.ptsPerUnit;}
-function rowName(g,r){if(r.customIdx==null)return r.ibada;var def=CUSTOM_DEFS[r.customIdx];var v=getCustomValue(g,r.customIdx);if(def.type==='choice')return r.ibada+' — '+(def.choices[v]||def.choices[0]).label;var base=def.baseName||r.ibada;return v+' '+base;}
+function customLabel(g,i){var def=CUSTOM_DEFS[i];if(!def)return '';var v=getCustomValue(g,i);return def.ibada+': '+v+' '+def.unit;}
+function rowPts(g,r){if(r.customIdx==null)return r.pts;var def=CUSTOM_DEFS[r.customIdx];var v=getCustomValue(g,r.customIdx);return (def.ptsDiv?Math.floor(v/100)*100:v)/(def.ptsDiv||1)*def.ptsPerUnit;}
+function rowName(g,r){if(r.customIdx==null)return r.ibada;var def=CUSTOM_DEFS[r.customIdx];var v=getCustomValue(g,r.customIdx);var base=def.baseName||r.ibada;return v+' '+base;}
 function rowEarned(g,ri){var r=ROWS[ri],pts=rowPts(g,r),total=0;for(var d=1;d<=DAYS;d++)if(((g.state||{})[sk(ri,d)]||0)===1)total+=pts;return total;}
+// حساب نقاط الأعمال من العداد
+function getAmalPointsForGirl(g){
+  const amal=g.amal||{};let total=0;
+  AMAL.forEach((a,i)=>{total+=(Number(amal[i])||0)*a.pts;});
+  return total;
+}
 async function loadData(){
   const btn=document.getElementById('refreshBtn');btn.textContent='جاري التحميل...';btn.classList.add('loading');btn.disabled=true;
   try{
     const url='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:json&sheet='+encodeURIComponent('بيانات')+'&t='+Date.now();
     const resp=await fetch(url);const txt=await resp.text();const json=JSON.parse(txt.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
     const rows=json.table.rows||[];
-    // ✅ التعديل: تجاهل صف العنوان "الاسم"
     girlsData=rows.filter(r=>r.c&&r.c[0]&&r.c[0].v&&r.c[0].v!=='الاسم').map(r=>{
       const c=r.c;const dt=[];for(let i=4;i<13;i++)dt.push(c[i]?Number(c[i].v)||0:0);
       return {name:c[0].v,grand:c[1]?Number(c[1].v)||0:0,avg:c[2]?c[2].v:'—',filled:c[3]?c[3].v:0,dayTotals:dt,state:readJSON(c[15]&&c[15].v,{}),lastUpdate:c[16]&&c[16].v?c[16].v.toString():'',notes:readJSON(c[17]&&c[17].v,{}),customSettings:readJSON(c[19]&&c[19].v,[]),amal:readJSON(c[20]&&c[20].v,{}),duaa:readJSON(c[21]&&c[21].v,{}),siyam:readJSON(c[22]&&c[22].v,{})};
@@ -154,7 +160,7 @@ function girlCard(g,gi,sorted,maxG){
     +'<div class="mini-panel" id="amalPanel_'+gi+'">'+aml+'</div>'
     +'<button class="section-btn" onclick="togglePanel(\'duaaPanel_'+gi+'\',this)"><span>🤲 خانة الدعاء</span><span>▼</span></button>'
     +'<div class="mini-panel" id="duaaPanel_'+gi+'">'+du+'</div>'
-    +'<button class="section-btn" onclick="togglePanel(\'siyamPanel_'+gi+'\',this)"><span>🌙 الصيام وقراءة أسماء الله الحسنى</span><span>▼</span></button>'
+    +'<button class="section-btn" onclick="togglePanel(\'siyamPanel_'+gi+'\',this)"><span>🌙 الصيام</span><span>▼</span></button>'
     +'<div class="mini-panel" id="siyamPanel_'+gi+'">'+sy+'</div>'
     +'</div></div>';
 }
@@ -164,9 +170,16 @@ function detailsTable(g){
   ROWS.forEach((r,ri)=>{const pts=rowPts(g,r);let earned=0;html+='<tr>';if(r.cat!==lastCat){html+='<td class="cat" rowspan="'+catRows[r.cat]+'">'+esc(r.cat)+'</td>';lastCat=r.cat;}html+='<td class="ibada">'+esc(rowName(g,r))+(r.badil?'<div style="font-size:7px;color:#b8860b;font-weight:400">🔄 '+esc(r.badil)+'</div>':'')+'</td><td>'+pts+'</td>';for(let d=1;d<=DAYS;d++){const v=(g.state&&g.state[sk(ri,d)])||0;if(v===1)earned+=pts;html+='<td><span class="id '+(v===1?'d':v===2?'m':'e')+'">'+(v===1?'✓':v===2?'✗':'')+'</span></td>';}html+='<td><b>'+earned+'</b></td></tr>';});
   return html+'</tbody></table>';
 }
+// ✅ عرض العداد في المانجر
 function amalHtml(g){
-  const amal=g.amal||{};let count=0;Object.keys(amal).forEach(k=>{if(amal[k])count++;});let html='<div class="custom-box"><div class="custom-title">تم: '+count+'/'+AMAL.length+'</div><div class="amal-list">';
-  AMAL.forEach((a,i)=>{html+='<span class="'+(amal[i]?'amal-ok':'amal-no')+'">'+(amal[i]?'✓ ':'')+esc(a.name)+' — '+a.pts+'</span>';});
+  const amal=g.amal||{};
+  const totalPts=getAmalPointsForGirl(g);
+  let html='<div class="custom-box"><div class="custom-title">🌟 مجموع نقاط الأعمال: '+totalPts+'</div><div class="amal-list">';
+  AMAL.forEach((a,i)=>{
+    const cnt=Number(amal[i])||0;const ok=cnt>0;
+    html+='<span class="'+(ok?'amal-ok':'amal-no')+'" style="'+(a.pts>=10?'background:'+(ok?'#fff8e1':'#fffdf0')+';border-color:#f0c040;':'')+'">'
+      +(ok?cnt+'× ':'')+esc(a.name)+' — '+(ok?cnt+'×'+a.pts+'=<b>'+(cnt*a.pts)+'</b>':a.pts)+'</span>';
+  });
   return html+'</div></div>';
 }
 function duaaHtml(g){
