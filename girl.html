@@ -159,7 +159,7 @@ var CK='dhulhijja_custom_v1';
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxELLJQlPz2zaFObOJGMBf62jSEecSMsmx4pozqW2NXiFZKGmpon6hbNHLgsIrtU9Zt/exec';
 const ROWS=[
   {cat:'القرآن',ibada:'البقرة',pts:20,badil:'ورد يا لطيف'},
-  {cat:'القرآن',ibada:'جزء قرآن',pts:30,customIdx:0,badil:'كل جزء = ١٠ أسماء الله الحسنى'},
+  {cat:'القرآن',ibada:'جزء قرآن',pts:30,customIdx:0,badil:'كل جزء = 3 أسماء الله الحسنى'},
   {cat:'القيام',ibada:'قيام ساعة',pts:5},
   {cat:'القيام',ibada:'قيام ساعتين',pts:10},
   {cat:'القيام',ibada:'قيام 3 ساعات',pts:15},
@@ -183,11 +183,13 @@ const CUSTOM_DEFS=[
   {ibada:'تهليل',ptsPerUnit:10,unit:'/يوم (مضاعفات ١٠٠)',max:10000,defaultVal:2500,ptsDiv:500,note:'أدنى ٢٥٠٠ باليوم'},
   {ibada:'سبحان الله وبحمده',ptsPerUnit:5,unit:'/يوم (مضاعفات ١٠٠)',max:1000,defaultVal:100,ptsDiv:100,note:'أدنى ١٠٠ باليوم'},
 ];
+// ✅ إضافة "تدريس الأولاد" — ١٠ نقاط
 const AMAL=[
   {name:'⭐ الاعتكاف من الفجر حتى الشروق',pts:10,hadith:'قال رسول الله ﷺ: «مَن صلّى الفجرَ في جماعة، ثم قعد يذكرُ اللهَ حتى تطلعَ الشمس، ثم صلّى ركعتين، كانت له كأجرِ حجّةٍ وعمرةٍ تامّةٍ تامّةٍ تامّة»'},
   {name:'⭐ فرضين جماعة',pts:10,hadith:'قال رسول الله ﷺ: صَلاةُ الجَمَاعَةِ أَفضَلُ مِنْ صَلاةِ الفَذِّ بِسَبْعٍ وَعِشْرِينَ دَرَجَةً'},
   {name:'⭐ صلاة مقنطرين',pts:10,hadith:'من قام بعشر آيات لم يكتب من الغافلين، ومن قام بمائة آية كتب من القانتين، ومن قام بألف آية كتب من المقنطرين.'},
   {name:'⭐ تحضير طبق وتقديمه للجارة',pts:10,hadith:'قال رسول الله ﷺ: «يا أبا ذر إذا طبختَ مَرَقةً فأكثِرْ ماءَها وتعاهَدْ جيرانَك»'},
+  {name:'⭐ تدريس الأولاد',pts:10,hadith:'قال رسول الله ﷺ: «خيرُكم من تعلَّم القرآن وعلَّمه»'},
   {name:'إفطار صائم',pts:5,hadith:'قال رسول الله ﷺ: «مَن فَطَّرَ صائمًا كان له مثلُ أجرِه، غيرَ أنه لا ينقص من أجرِ الصائمِ شيء»'},
   {name:'جبر خاطر الأم والأب',pts:5,hadith:'قال رسول الله ﷺ: «رِضا الربِّ في رضا الوالد، وسَخطُ الربِّ في سَخطِ الوالد»'},
   {name:'البسملة قبل كل عمل',pts:5,hadith:'قال رسول الله ﷺ: «كل أمرٍ ذي بالٍ لا يُبدأ فيه ببسم الله فهو أبتر»'},
@@ -247,7 +249,10 @@ function build(){
     if(r.cat!==lastCat){const span=ROWS.filter(x=>x.cat===r.cat).length;const td=document.createElement('td');td.className='cc';td.rowSpan=span;const abbr={'القرآن':'قرآن','القيام':'قيام','الصلاة':'صلاة','الذكر':'ذكر'};td.textContent=abbr[r.cat]||r.cat;tr.appendChild(td);lastCat=r.cat;}
     const ti=document.createElement('td');ti.className='ic';
     ti.style.cssText='font-size:10.5px;color:var(--tx);padding:3px 6px 3px 3px;border:1px solid #ede7db;background:var(--sf);overflow:hidden;white-space:normal;line-height:1.4';
-    if(r.customIdx!==undefined){const _def=CUSTOM_DEFS[r.customIdx];const _cs=getCustomSettings();const _val=(_cs&&_cs[r.customIdx]!=null)?_cs[r.customIdx]:_def.defaultVal;const _base=_def.baseName||r.ibada;ti.innerHTML='<div>'+_val+' '+_base+'</div>'+(r.badil?'<div style="font-size:8px;color:#b8860b;margin-top:1px">🔄 '+r.badil+'</div>':'');}
+    if(r.customIdx!==undefined){const _def=CUSTOM_DEFS[r.customIdx];const _cs=getCustomSettings();const _val=(_cs&&_cs[r.customIdx]!=null)?_cs[r.customIdx]:_def.defaultVal;const _base=_def.baseName||r.ibada;
+      // ✅ إصلاح: الحفاظ على البديل عند عرض الخلية
+      ti.innerHTML='<div>'+_val+' '+_base+'</div>'+(r.badil?'<div style="font-size:8px;color:#b8860b;margin-top:1px">🔄 '+r.badil+'</div>':'');
+    }
     else{ti.innerHTML='<div>'+r.ibada+'</div>'+(r.badil?'<div style="font-size:8px;color:#b8860b;margin-top:1px">🔄 '+r.badil+'</div>':'');}
     tr.appendChild(ti);
     const tp=document.createElement('td');tp.className='pc';tp.id='pts_'+ri;tp.textContent=r.pts;tr.appendChild(tp);
@@ -264,7 +269,6 @@ function saveCustomSettings(arr){_ls.setItem('dhulhijja_csettings',JSON.stringif
 function buildCustomSettings(){
   const box=document.getElementById('customSettings');if(!box)return;
   const saved=getCustomSettings();box.innerHTML='';
-  // Add ملاحظة مضاعفات before الذكر section
   const dhikrNote=document.createElement('div');
   dhikrNote.style.cssText='background:#fff4d8;border:1px solid #f0c040;border-radius:8px;padding:7px 10px;margin-bottom:8px;font-size:11px;color:#856404;font-weight:600;display:none';
   dhikrNote.textContent='⚠️ أدخلي العدد بمضاعفات ١٠٠ فقط (١٠٠، ٢٠٠، ٣٠٠...)';
@@ -289,7 +293,9 @@ function buildCustomSettings(){
         document.getElementById('cp_'+i).textContent='= '+p+' نقطة';
         const arr=CUSTOM_DEFS.map((d,j)=>{if(d.type==='choice'){return saved?saved[j]:0;}const el=document.getElementById('ci_'+j);return el?parseInt(el.value)||0:(saved?saved[j]:0);});
         saveCustomSettings(arr);
-        ROWS.forEach((r,ri)=>{if(r.customIdx===i){r.pts=p;const el=document.getElementById('pts_'+ri);if(el)el.textContent=r.pts;const trs=document.getElementById('tbody').rows;if(trs[ri]){const ti=trs[ri].querySelector('td.ic');if(ti){const _def=CUSTOM_DEFS[i];const _base=_def.baseName||r.ibada;ti.textContent=n+' '+_base;}}}});
+        ROWS.forEach((r,ri)=>{if(r.customIdx===i){r.pts=p;const el=document.getElementById('pts_'+ri);if(el)el.textContent=r.pts;
+          // ✅ إصلاح: الحفاظ على البديل عند تغيير الكمية
+          const trs=document.getElementById('tbody').rows;if(trs[ri]){const ti=trs[ri].querySelector('td.ic');if(ti){const _def=CUSTOM_DEFS[i];const _base=_def.baseName||r.ibada;ti.innerHTML='<div>'+n+' '+_base+'</div>'+(r.badil?'<div style="font-size:8px;color:#b8860b;margin-top:1px">🔄 '+r.badil+'</div>':'');}}}});
         recalc();
       };return;
     }
@@ -345,7 +351,7 @@ function openReport(){
   let filled=0;for(let d=1;d<=DAYS;d++){if(ROWS.some((_,ri)=>(state[sk(ri,d)]||0)!==0))filled++;}
   const avg=filled>0?(grand/filled).toFixed(1):'—';
   const maxVal=Math.max(...dt,1);
-  const CAT_COLORS={'الأذكار':'#2d8a52','القرآن':'#1a6b8a','القيام':'#6b3a8a','الصلاة':'#c47a1a','الذكر':'#8a2d2d'};
+  const CAT_COLORS={'القرآن':'#1a6b8a','القيام':'#6b3a8a','الصلاة':'#c47a1a','الذكر':'#8a2d2d'};
   const bars=dt.map((v,i)=>{const h=maxVal>0?Math.round((v/maxVal)*110):0;const col=v===0?'#e2d9c8':v>=maxVal*0.8?'#1a6b3c':v>=maxVal*0.5?'#5cb87a':'#a8e6c0';return '<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px"><div style="font-size:9px;font-weight:700;color:#1a6b3c">'+(v>0?v:'')+'</div><div style="width:75%;background:'+col+';border-radius:4px 4px 0 0;height:'+h+'px;min-height:2px"></div><div style="font-size:9px;color:#7a6a52">'+(i+1)+'</div></div>';}).join('');
   const cats={};
   ROWS.forEach((r,ri)=>{
@@ -353,23 +359,14 @@ function openReport(){
     cats[r.cat].max+=r.pts*DAYS;
     let rowEarned=0;for(let d=1;d<=DAYS;d++)if((state[sk(ri,d)]||0)===1)rowEarned+=r.pts;
     cats[r.cat].earned+=rowEarned;
-    let ibadaLabel=r.ibada;
-    if(r.customIdx!==undefined){
-      const def=CUSTOM_DEFS[r.customIdx];const cs=getCustomSettings();
-      if(def&&def.type==='choice'){const cidx=cs?cs[r.customIdx]:0;ibadaLabel=r.ibada+' ('+(def.choices[cidx]?def.choices[cidx].label:def.choices[0].label)+')';}
-    }
-    cats[r.cat].rows.push({ri,ibada:ibadaLabel,pts:r.pts,earned:rowEarned,badil:r.badil||''});
+    cats[r.cat].rows.push({ri,ibada:r.ibada,pts:r.pts,earned:rowEarned,badil:r.badil||''});
   });
   let catsHtml='';
   Object.entries(cats).forEach(([cat,info])=>{
     const col=CAT_COLORS[cat]||'#1a6b3c';const catPct=info.max>0?Math.round(info.earned/info.max*100):0;
     let rowsHtml='';
     info.rows.forEach(row=>{
-      const r=ROWS[row.ri];let ibadaLabel=row.ibada;
-      if(r.customIdx!==undefined){
-        const def=CUSTOM_DEFS[r.customIdx];
-        if(def&&def.type!=='choice'&&!def.ptsDiv){const qty=parseInt(document.getElementById('ci_'+r.customIdx)?.value)||0;if(qty>0)ibadaLabel=row.ibada+' <span style="background:#f0c040;color:#856404;font-size:9px;padding:1px 5px;border-radius:4px;font-weight:700">'+qty+' '+def.unit+'</span>';}
-      }
+      let ibadaLabel=row.ibada;
       if(row.badil)ibadaLabel+='<div style="font-size:8px;color:#b8860b;margin-top:1px">🔄 '+row.badil+'</div>';
       const dayDots=Array.from({length:DAYS},(_,di)=>{const v=state[sk(row.ri,di+1)]||0;const bg=v===1?'#d4f4e2':v===2?'#fcd5d5':'#f0f0f0';const color=v===1?'#1a6b3c':v===2?'#c0392b':'#ccc';const sym=v===1?'✓':v===2?'✗':'';return '<div style="width:18px;height:18px;background:'+bg+';border-radius:3px;font-size:8px;font-weight:700;color:'+color+';display:flex;align-items:center;justify-content:center">'+sym+'</div>';}).join('');
       rowsHtml+='<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;background:#f8faf8;margin-bottom:3px"><div style="flex:1;font-size:11px;color:#2c2416">'+ibadaLabel+'</div><div style="display:flex;gap:2px">'+dayDots+'</div><div style="width:28px;text-align:center;font-size:11px;font-weight:700;color:#1a6b3c">'+row.earned+'</div></div>';
@@ -381,7 +378,7 @@ function openReport(){
   const amalHtml='<div style="background:#fff;border-radius:12px;padding:14px;border:1px solid #e2d9c8;margin-bottom:1.2rem"><div style="font-size:13px;font-weight:700;color:#1a6b3c;margin-bottom:12px">🌟 العمل الصالح — '+amalPoints+' نقطة</div>'+amalRows+'</div>';
   let duaaRows='';
   for(let d=1;d<=DAYS;d++){
-    const daily=!!duaaDone[d+'-daily'];const self=!!duaaDone[d+'-self'];const ummah=!!duaaDone[d+'-ummah'];
+    const daily=!!getDuaaDone()[d+'-daily'];const self=!!getDuaaDone()[d+'-self'];const ummah=!!getDuaaDone()[d+'-ummah'];
     const dots='<div style="display:flex;gap:6px"><div><div style="font-size:8px;color:#7a6a52;margin-bottom:2px">دعاء اليوم</div><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:'+(daily?'#d4f4e2':'#f0f0f0')+';color:'+(daily?'#1a6b3c':'#ccc')+';font-size:10px;font-weight:700">'+(daily?'✓':'')+'</span></div><div><div style="font-size:8px;color:#7a6a52;margin-bottom:2px">لنفسك</div><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:'+(self?'#d4f4e2':'#f0f0f0')+';color:'+(self?'#1a6b3c':'#ccc')+';font-size:10px;font-weight:700">'+(self?'✓':'')+'</span></div><div><div style="font-size:8px;color:#7a6a52;margin-bottom:2px">لأمة المسلمين</div><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:'+(ummah?'#d4f4e2':'#f0f0f0')+';color:'+(ummah?'#1a6b3c':'#ccc')+';font-size:10px;font-weight:700">'+(ummah?'✓':'')+'</span></div></div>';
     duaaRows+='<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;background:#f8faf8;margin-bottom:3px"><div style="width:70px;font-size:11px;color:#2c2416;font-weight:700">اليوم '+d+'</div><div style="flex:1;font-size:10px;color:#7a6a52;line-height:1.4">'+(DUAAS[d-1]||'')+'</div><div style="white-space:nowrap">'+dots+'</div></div>';
   }
@@ -412,7 +409,6 @@ function guestMode(){const sid=Math.random().toString(36).slice(2,8);window.open
 function getSiyamData(){try{return JSON.parse(_ls.getItem(SIYAMK)||'{}')}catch(e){return {};}}
 function saveSiyamData(d){_ls.setItem(SIYAMK,JSON.stringify(d));}
 function getSiyamPoints(){const d=getSiyamData();let t=0;for(let day=1;day<=9;day++)if(d['siyam-'+day])t+=10;return t;}
-
 const AK='dhulhijja_amal_v1';
 function getAmalDone(){try{return JSON.parse(_ls.getItem(AK)||'{}')}catch(e){return {};}}
 function toggleAmal(){const body=document.getElementById('amalBody');const arr=document.getElementById('amalArr');const open=body.style.display==='block';body.style.display=open?'none':'block';arr.textContent=open?'▼':'▲';if(!open)buildAmal();}
@@ -475,7 +471,6 @@ function buildSiyam(){
   pts.textContent=isFasting?'✓ مسجّلة 10 نقاط لهذا اليوم':'لم يُسجَّل شيء لهذا اليوم بعد';
   body.appendChild(pts);
 }
-
 function buildSiyamReportHtml(data,points){
   let rows='';
   for(let d=1;d<=9;d++){
@@ -489,7 +484,6 @@ function buildSiyamReportHtml(data,points){
   }
   return '<div style="background:#fff;border-radius:12px;padding:14px;border:1px solid #e2d9c8;margin-bottom:1.2rem"><div style="font-size:13px;font-weight:700;color:#1a6b3c;margin-bottom:8px">🌙 الصيام — '+points+' نقطة</div>'+rows+'</div>';
 }
-
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 document.getElementById('userName').addEventListener('input',save);
 initCustomPts();load();build();buildCustomSettings();buildDuaa();buildSiyam();
