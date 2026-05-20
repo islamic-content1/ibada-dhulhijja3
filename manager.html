@@ -163,6 +163,30 @@ function calcGirlDayPct(g){
   for(let d=1;d<=DAYS;d++){const hasData=ROWS.some((_,ri)=>((g.state||{})[sk(ri,d)]||0)!==0);if(hasData){sum+=Math.min(100,Math.round(calcGirlDayTotal(g,d)/dayMax*100));count++;}}
   return count>0?Math.round(sum/count):null;
 }
+
+function rankVisual(rank){
+  const medals={1:'🥇',2:'🥈',3:'🥉'};
+  return {
+    label: medals[rank] || ('#'+rank),
+    cls: rank===1?'t1':rank===2?'t2':rank===3?'t3':'',
+    ncls: rank===1?'r1':rank===2?'r2':rank===3?'r3':'',
+    chipFirst: rank===1?'first':''
+  };
+}
+function rankLabel(rank){
+  return rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank+'.';
+}
+function getRankByScore(list,targetName,scoreGetter){
+  let rank=1,prev=null;
+  for(let i=0;i<list.length;i++){
+    const score=scoreGetter(list[i]);
+    if(prev!==null && score<prev)rank=i+1;
+    if(list[i].name===targetName)return rank;
+    prev=score;
+  }
+  return list.findIndex(x=>x.name===targetName)+1;
+}
+
 async function loadData(){
   const btn=document.getElementById('refreshBtn');btn.textContent='جاري التحميل...';btn.classList.add('loading');btn.disabled=true;
   try{
@@ -195,7 +219,7 @@ function render(){
   sorted.forEach(g=>{const h=Math.round(g.grand/maxG*95);html+='<div class="bi"><div class="bv">'+g.grand+'</div><div class="bf" style="height:'+h+'px"></div><div class="bn">'+esc(g.name)+'</div></div>';});
   html+='</div></div>';
   html+='<div class="card"><div class="card-t">🏅 الترتيب حسب المجموع الكلي</div>';
-  sorted.forEach((g,i)=>{const cls=i===0?'t1':i===1?'t2':i===2?'t3':'';const ncls=i===0?'r1':i===1?'r2':i===2?'r3':'';const medals=['🥇','🥈','🥉'];const pct=Math.round(g.grand/maxG*100);html+='<div class="rank-item '+cls+'"><div class="rnum '+ncls+'">'+(i<3?medals[i]:i+1)+'</div><div class="rinfo"><div class="rname">'+esc(g.name)+'</div><div class="rmeta">مجموع: '+g.grand+' | معدل: '+g.avg+' | أيام: '+g.filled+'/9</div><div class="rtrack"><div class="rfill" style="width:'+pct+'%"></div></div></div><div class="rpts">'+g.grand+'</div></div>';});
+  let totalRank=1,totalPrev=null;sorted.forEach((g,i)=>{if(totalPrev!==null && g.grand<totalPrev)totalRank=i+1;totalPrev=g.grand;const rv=rankVisual(totalRank);const pct=Math.round(g.grand/maxG*100);html+='<div class="rank-item '+rv.cls+'"><div class="rnum '+rv.ncls+'">'+rv.label+'</div><div class="rinfo"><div class="rname">'+esc(g.name)+'</div><div class="rmeta">مجموع: '+g.grand+' | معدل: '+g.avg+' | أيام: '+g.filled+'/9</div><div class="rtrack"><div class="rfill" style="width:'+pct+'%"></div></div></div><div class="rpts">'+g.grand+'</div></div>';});
   html+='</div>';
   // ✅ الأوائل حسب المعدل — قابلة للفتح/الإغلاق
   const withPct=girlsData.map(g=>({...g,dayPct:calcGirlDayPct(g)})).filter(g=>g.dayPct!==null).sort((a,b)=>b.dayPct-a.dayPct);
@@ -204,7 +228,7 @@ function render(){
   html+='<div class="collapsible-body" id="pctRank">';
   html+='<div style="font-size:10px;color:var(--mu);margin-bottom:8px;padding:6px 10px;background:#f0faf5;border-radius:8px;border:1px solid var(--gM)">معدل أدائك اليومي من 100 — يُحسب بناءً على كمياتك الشخصية + الصيام + الدعاء</div>';
   if(!withPct.length){html+='<div style="font-size:11px;color:#aaa;padding:8px">لا يوجد بيانات بعد</div>';}
-  else{withPct.forEach((g,i)=>{const cls=i===0?'t1':i===1?'t2':i===2?'t3':'';const ncls=i===0?'r1':i===1?'r2':i===2?'r3':'';const medals=['🥇','🥈','🥉'];const pctColor=g.dayPct>=80?'var(--gD)':g.dayPct>=50?'#b8860b':'var(--rD)';html+='<div class="rank-item '+cls+'"><div class="rnum '+ncls+'">'+(i<3?medals[i]:i+1)+'</div><div class="rinfo"><div class="rname">'+esc(g.name)+'</div><div class="rmeta">مجموع: '+g.grand+' | أيام: '+g.filled+'/9</div><div class="rtrack"><div class="rfill" style="width:'+g.dayPct+'%"></div></div></div><div class="rpts" style="color:'+pctColor+'">'+g.dayPct+'%</div></div>';});}
+  else{let pctRank=1,pctPrev=null;withPct.forEach((g,i)=>{if(pctPrev!==null && g.dayPct<pctPrev)pctRank=i+1;pctPrev=g.dayPct;const rv=rankVisual(pctRank);const pctColor=g.dayPct>=80?'var(--gD)':g.dayPct>=50?'#b8860b':'var(--rD)';html+='<div class="rank-item '+rv.cls+'"><div class="rnum '+rv.ncls+'">'+rv.label+'</div><div class="rinfo"><div class="rname">'+esc(g.name)+'</div><div class="rmeta">مجموع: '+g.grand+' | أيام: '+g.filled+'/9</div><div class="rtrack"><div class="rfill" style="width:'+g.dayPct+'%"></div></div></div><div class="rpts" style="color:'+pctColor+'">'+g.dayPct+'%</div></div>';});}
   html+='</div></div>';
   html+=perIbadaRanking()+'<div class="card-t" style="margin-bottom:10px">👥 تفصيل أداء كل آنسة</div>';
   girlsData.forEach((g,gi)=>{html+=girlCard(g,gi,sorted,maxG);});
@@ -212,11 +236,11 @@ function render(){
 }
 function perIbadaRanking(){
   let html='<div class="card"><div class="card-t">🏆 الأولى بكل عبادة</div>';
-  CAT_ORDER.forEach((cat,ci)=>{const cid='catRank_'+ci;html+='<button class="cat-rank-btn" onclick="togglePanel(\''+cid+'\',this)"><span>📌 '+cat+'</span><span>▼</span></button><div class="cat-rank-body" id="'+cid+'">';ROWS.forEach((r,ri)=>{if(r.cat!==cat)return;const ranked=girlsData.map(g=>({name:g.name,total:rowEarned(g,ri)})).filter(x=>x.total>0).sort((a,b)=>b.total-a.total);html+='<div class="ibada-rank"><div class="ibada-rank-title">'+esc(r.ibada)+'</div>';if(!ranked.length)html+='<span style="font-size:10px;color:#aaa">لا يوجد إنجاز بعد</span>';ranked.forEach((x,i)=>{html+='<span class="rank-chip '+(i===0?'first':'')+'">'+(i===0?'🥇':i===1?'🥈':i===2?'🥉':(i+1)+'.')+' <b>'+esc(x.name)+'</b> <span style="color:var(--gD);font-weight:700">'+x.total+'</span></span>';});html+='</div>';});html+='</div>';});
+  CAT_ORDER.forEach((cat,ci)=>{const cid='catRank_'+ci;html+='<button class="cat-rank-btn" onclick="togglePanel(\''+cid+'\',this)"><span>📌 '+cat+'</span><span>▼</span></button><div class="cat-rank-body" id="'+cid+'">';ROWS.forEach((r,ri)=>{if(r.cat!==cat)return;const ranked=girlsData.map(g=>({name:g.name,total:rowEarned(g,ri)})).filter(x=>x.total>0).sort((a,b)=>b.total-a.total);html+='<div class="ibada-rank"><div class="ibada-rank-title">'+esc(r.ibada)+'</div>';if(!ranked.length)html+='<span style="font-size:10px;color:#aaa">لا يوجد إنجاز بعد</span>';let ibRank=1,ibPrev=null;ranked.forEach((x,i)=>{if(ibPrev!==null && x.total<ibPrev)ibRank=i+1;ibPrev=x.total;html+='<span class="rank-chip '+(ibRank===1?'first':'')+'">'+rankLabel(ibRank)+' <b>'+esc(x.name)+'</b> <span style="color:var(--gD);font-weight:700">'+x.total+'</span></span>';});html+='</div>';});html+='</div>';});
   return html+'</div>';
 }
 function girlCard(g,gi,sorted,maxG){
-  const pct=maxG>0?Math.round(g.grand/maxG*100):0;const rank=sorted.findIndex(s=>s.name===g.name)+1;const medal=rank<=3?['🥇','🥈','🥉'][rank-1]:'#'+rank;
+  const pct=maxG>0?Math.round(g.grand/maxG*100):0;const rank=getRankByScore(sorted,g.name,x=>x.grand);const medal=rankVisual(rank).label;
   const dt=g.dayTotals||Array(DAYS).fill(0);const dayPct=calcGirlDayPct(g);
   const dots=dt.map((v,i)=>'<div class="dd '+(v>0?'f':'e')+'"><div class="dn">'+(i+1)+'</div>'+(v>0?v:'')+'</div>').join('');
   const chips=CUSTOM_DEFS.map((_,i)=>'<span class="chip">'+esc(customLabel(g,i))+'</span>').join('');
@@ -295,7 +319,7 @@ function exportExcel(){
   if(!girlsData.length){showToast('لا يوجد بيانات');return;}
   const wb=XLSX.utils.book_new();const sorted=[...girlsData].sort((a,b)=>b.grand-a.grand);
   const sum=[['الترتيب','الاسم','المجموع','المعدل','الأيام','معدل اليوم %',...Array.from({length:DAYS},(_,i)=>'يوم '+(i+1)),'آخر تحديث']];
-  sorted.forEach((g,i)=>{const dp=calcGirlDayPct(g);sum.push([i+1,g.name,g.grand,g.avg,g.filled,dp!==null?dp+'%':'—',...(g.dayTotals||[]),g.lastUpdate||'']);});
+  let exRank=1,exPrev=null;sorted.forEach((g,i)=>{if(exPrev!==null && g.grand<exPrev)exRank=i+1;exPrev=g.grand;const dp=calcGirlDayPct(g);sum.push([exRank,g.name,g.grand,g.avg,g.filled,dp!==null?dp+'%':'—',...(g.dayTotals||[]),g.lastUpdate||'']);});
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sum),'ملخص');
   girlsData.forEach(g=>{const d=[['الفئة','العبادة','النقاط',...Array.from({length:DAYS},(_,i)=>'يوم '+(i+1)),'المجموع']];ROWS.forEach((r,ri)=>{const pts=rowPts(g,r);let s=0;const row=[r.cat,rowName(g,r),pts];for(let day=1;day<=DAYS;day++){const v=((g.state||{})[sk(ri,day)]||0)===1?pts:0;row.push(v);s+=v;}row.push(s);d.push(row);});XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(d),String(g.name).slice(0,28));});
   XLSX.writeFile(wb,'نتائج_الآنسات_٩_ذي_الحجة.xlsx');showToast('تم التصدير ✓');
